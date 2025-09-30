@@ -24,7 +24,7 @@ Esta é uma versão simplificada, ideal para iniciantes em programação web, co
 
 ### 1. Baixe o projeto
 - Faça download dos arquivos do projeto
-- Ou clone: `git clone [url-do-repositorio]`
+- Ou clone: `git clone https://github.com/CarlosDEV-Ss/Meu-Formulario/tree/main/gerador-curriculos`
 
 ### 2. Configure o XAMPP
 - Instale o XAMPP
