@@ -74,6 +74,9 @@ function formatarData($data) {
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
+    <!-- jsPDF e html2canvas para gerar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body { background: white; }
         .curriculo {
@@ -143,7 +146,7 @@ function formatarData($data) {
 </head>
 <body>
     <div class="acoes">
-        <button onclick="window.print()" class="btn btn-primary">Imprimir Currículo</button>
+        <button onclick="baixarPDF()" class="btn btn-primary">⬇ Baixar Currículo em PDF</button>
         <a href="index.php" class="btn btn-secondary">Voltar ao Formulário</a>
     </div>
 
@@ -213,5 +216,48 @@ function formatarData($data) {
         </div>
         <?php endif; ?>
     </div>
+
+    <script>
+    function baixarPDF() {
+        const { jsPDF } = window.jspdf;
+        const botoes = document.querySelector('.acoes');
+        
+        // Esconde botões temporariamente
+        botoes.style.display = 'none';
+        
+        html2canvas(document.querySelector('.curriculo'), {
+            scale: 2,
+            useCORS: true,
+            logging: false
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            const imgWidth = 210; // Largura A4 em mm
+            const pageHeight = 297; // Altura A4 em mm
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+            
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            
+            // Adiciona páginas extras se necessário
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            
+            // Nome do arquivo baseado no nome do usuário
+            const nomeArquivo = 'Curriculo_<?= str_replace(' ', '_', $dados['nome']) ?>.pdf';
+            pdf.save(nomeArquivo);
+            
+            // Mostra botões novamente
+            botoes.style.display = 'block';
+        });
+    }
+    </script>
 </body>
 </html>
